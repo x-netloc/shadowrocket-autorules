@@ -1,0 +1,51 @@
+# Which upstream categories to convert to Shadowrocket .list format.
+# Format: `geosite:<name>` or `geoip:<name>`, one per line.
+# Use `geosite:*` / `geoip:*` to include every category.
+# Run the workflow once, then browse rules/INDEX.md to see what's available.
+
+# --- geosite (domains) ---
+geosite:ru-blocked
+geosite:refilter
+geosite:antifilter-download
+geosite:ru-available-only-inside
+geosite:category-ads-all
+geosite:private
+
+# Popular unblock targets (from v2fly/domain-list-community, included in upstream)
+geosite:youtube
+geosite:twitter
+geosite:discord
+geosite:meta
+geosite:openai
+geosite:telegram
+geosite:yandex
+
+# Apple
+geosite:apple
+geosite:icloud
+
+# Russian services (from v2fly/domain-list-community)
+geosite:category-ru
+geosite:category-gov-ru
+geosite:category-bank-ru
+geosite:category-media-ru
+geosite:category-ecommerce-ru
+geosite:category-retail-ru
+geosite:category-travel-ru
+geosite:category-medicine-ru
+
+# --- geoip (CIDRs) ---
+geoip:ru-blocked
+geoip:re-filter
+geoip:private
+geoip:telegram
+geoip:cloudflare
+geoip:cloudfront
+geoip:fastly
+geoip:facebook
+geoip:google
+geoip:twitter
+geoip:yandex
+
+# Russia geoip (from v2fly/geoip)
+geoip:ru

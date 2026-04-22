@@ -1,0 +1,149 @@
+name: Rebuild Shadowrocket rules
+
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/rebuild.yml'
+      - 'scripts/**'
+      - 'categories.txt'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rebuild
+  cancel-in-progress: false
+
+env:
+  UPSTREAM: runetfreedom/russia-v2ray-rules-dat
+  UPSTREAM_REF: release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch upstream checksums
+        id: upstream
+        run: |
+          set -euo pipefail
+          base="https://raw.githubusercontent.com/${UPSTREAM}/${UPSTREAM_REF}"
+          curl -fsSL "$base/geosite.dat.sha256sum" -o upstream.geosite.sha256
+          curl -fsSL "$base/geoip.dat.sha256sum"   -o upstream.geoip.sha256
+          combined=$(cat upstream.geosite.sha256 upstream.geoip.sha256 | sha256sum | awk '{print $1}')
+          echo "combined=$combined" >> "$GITHUB_OUTPUT"
+
+      - name: Decide whether to rebuild
+        id: check
+        run: |
+          if [ -f .upstream.sha256 ] && [ "$(cat .upstream.sha256)" = "${{ steps.upstream.outputs.combined }}" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Upstream unchanged, skipping rebuild."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup Go
+        if: steps.check.outputs.skip != 'true'
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Install v2dat
+        if: steps.check.outputs.skip != 'true'
+        run: go install github.com/urlesistiana/v2dat@latest
+
+      - name: Download geosite.dat / geoip.dat
+        if: steps.check.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          base="https://raw.githubusercontent.com/${UPSTREAM}/${UPSTREAM_REF}"
+          curl -fsSL "$base/geosite.dat" -o geosite.dat
+          curl -fsSL "$base/geoip.dat"   -o geoip.dat
+          sha256sum -c upstream.geosite.sha256
+          sha256sum -c upstream.geoip.sha256
+
+      - name: Unpack via v2dat
+        if: steps.check.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          rm -rf unpacked && mkdir -p unpacked/geosite unpacked/geoip
+          v2dat unpack geosite -o unpacked/geosite geosite.dat
+          v2dat unpack geoip   -o unpacked/geoip   geoip.dat
+
+      - name: Convert to Shadowrocket .list
+        if: steps.check.outputs.skip != 'true'
+        run: |
+          rm -rf rules
+          python3 scripts/convert.py \
+            --geosite-in  unpacked/geosite \
+            --geoip-in    unpacked/geoip \
+            --categories  categories.txt \
+            --out         rules \
+            --upstream    "$UPSTREAM@$UPSTREAM_REF"
+
+      - name: Compute release tag
+        if: steps.check.outputs.skip != 'true'
+        id: tag
+        run: |
+          tag="$(date -u +%Y%m%d%H%M)"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Force-push rules to dist branch
+        if: steps.check.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          echo "${{ steps.upstream.outputs.combined }}" > rules/.upstream.sha256
+          work="$(mktemp -d)"
+          cp -r rules/. "$work/"
+          cd "$work"
+          git init -q -b dist
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote add origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+          git add .
+          git commit -q -m "dist snapshot ${{ steps.tag.outputs.tag }} (upstream ${{ steps.upstream.outputs.combined }})"
+          git push -q --force origin dist
+
+      - name: Build release notes
+        if: steps.check.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          {
+            echo "Upstream: \`${UPSTREAM}@${UPSTREAM_REF}\`"
+            echo "Combined sha256: \`${{ steps.upstream.outputs.combined }}\`"
+            echo
+            cat rules/INDEX.md
+          } > RELEASE_NOTES.md
+
+      - name: Create GitHub Release
+        if: steps.check.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          tag="${{ steps.tag.outputs.tag }}"
+          gh release create "$tag" \
+            --title "Released on $tag" \
+            --notes-file RELEASE_NOTES.md \
+            $(find rules -type f \( -name '*.list' -o -name 'INDEX.md' \))
+
+      - name: Update upstream marker on main
+        if: steps.check.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          echo "${{ steps.upstream.outputs.combined }}" > .upstream.sha256
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .upstream.sha256
+          if git diff --cached --quiet; then
+            echo "No marker change."
+          else
+            git commit -q -m "chore: upstream ${{ steps.upstream.outputs.combined }} -> release ${{ steps.tag.outputs.tag }}"
+            git push -q
+          fi
