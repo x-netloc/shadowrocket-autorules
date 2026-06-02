@@ -1,0 +1,8 @@
+# geosite:category-media-ru
+# Source: runetfreedom/russia-v2ray-rules-dat@release
+# Auto-generated, do not edit by hand.
+
+DOMAIN-SUFFIX,russiatoday.com
+DOMAIN-SUFFIX,rteam.tech
+DOMAIN-SUFFIX,shop-rt.com
+DOMAIN-SUFFIX,swentr.site
