@@ -1,0 +1,40 @@
+# Shadowrocket rule-set index
+# Source: runetfreedom/russia-v2ray-rules-dat@release
+
+| Kind | Category | Rules | Path |
+| --- | --- | ---: | --- |
+| geosite | ru-blocked | 74939 | `rules/geosite/ru-blocked.list` |
+| geosite | refilter | 74858 | `rules/geosite/refilter.list` |
+| geosite | antifilter-download | 1318396 | `rules/geosite/antifilter-download.list` |
+| geosite | ru-available-only-inside | 153 | `rules/geosite/ru-available-only-inside.list` |
+| geosite | category-ads-all | 148687 | `rules/geosite/category-ads-all.list` |
+| geosite | private | 130 | `rules/geosite/private.list` |
+| geosite | youtube | 178 | `rules/geosite/youtube.list` |
+| geosite | twitter | 24 | `rules/geosite/twitter.list` |
+| geosite | discord | 28 | `rules/geosite/discord.list` |
+| geosite | meta | 553 | `rules/geosite/meta.list` |
+| geosite | openai | 19 | `rules/geosite/openai.list` |
+| geosite | telegram | 21 | `rules/geosite/telegram.list` |
+| geosite | yandex | 129 | `rules/geosite/yandex.list` |
+| geosite | apple | 1785 | `rules/geosite/apple.list` |
+| geosite | icloud | 53 | `rules/geosite/icloud.list` |
+| geosite | category-ru | 1041 | `rules/geosite/category-ru.list` |
+| geosite | category-gov-ru | 128 | `rules/geosite/category-gov-ru.list` |
+| geosite | category-bank-ru | 309 | `rules/geosite/category-bank-ru.list` |
+| geosite | category-media-ru | 135 | `rules/geosite/category-media-ru.list` |
+| geosite | category-ecommerce-ru | 176 | `rules/geosite/category-ecommerce-ru.list` |
+| geosite | category-retail-ru | 78 | `rules/geosite/category-retail-ru.list` |
+| geosite | category-travel-ru | 24 | `rules/geosite/category-travel-ru.list` |
+| geosite | category-medicine-ru | 20 | `rules/geosite/category-medicine-ru.list` |
+| geoip | ru-blocked | 88592 | `rules/geoip/ru-blocked.list` |
+| geoip | re-filter | 25167 | `rules/geoip/re-filter.list` |
+| geoip | private | 18 | `rules/geoip/private.list` |
+| geoip | telegram | 12 | `rules/geoip/telegram.list` |
+| geoip | cloudflare | 810 | `rules/geoip/cloudflare.list` |
+| geoip | cloudfront | 210 | `rules/geoip/cloudfront.list` |
+| geoip | fastly | 77 | `rules/geoip/fastly.list` |
+| geoip | facebook | 119 | `rules/geoip/facebook.list` |
+| geoip | google | 7327 | `rules/geoip/google.list` |
+| geoip | twitter | 21 | `rules/geoip/twitter.list` |
+| geoip | yandex | 72 | `rules/geoip/yandex.list` |
+| geoip | ru | 25017 | `rules/geoip/ru.list` |
