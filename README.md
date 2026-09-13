@@ -1,20 +1,20 @@
 # shadowrocket-autorules
 
-Этот репозиторий содержит автоматически обновляемые правила маршрутизации split routing для [**Shadowrocket**](https://apps.apple.com/us/app/shadowrocket/id932747118), собранные на основе данных из [@runetfreedom/russia-v2ray-rules-dat](https://github.com/runetfreedom/russia-v2ray-rules-dat).
+Этот репозиторий содержит автоматически обновляемые правила маршрутизации split routing для [**Shadowrocket**](https://apps.apple.com/us/app/shadowrocket/id932747118).
 
-Upstream-репозиторий распространяет `geoip.dat` и `geosite.dat`, которые Shadowrocket нативно не понимает. Здесь они распаковываются через [@urlesistiana/v2dat](https://github.com/urlesistiana/v2dat) и конвертируются в `.list` формат, подключаемый в Shadowrocket как `RULE-SET` по URL.
+Единый каталог категорий и профили маршрутизации находятся в [`autorules`](https://github.com/x-netloc/autorules). Указанный там upstream распространяет `geoip.dat` и `geosite.dat`, которые Shadowrocket нативно не понимает. Здесь они распаковываются через [@urlesistiana/v2dat](https://github.com/urlesistiana/v2dat) и конвертируются в `.list` формат, подключаемый в Shadowrocket как `RULE-SET` по URL.
 
-Репозиторий пересобирается в течение часа после обновления upstream.
+Репозиторий проверяет upstream и `autorules` каждый час. Изменения категорий автоматически попадают в ветку `dist`, а изменения и новые профили — в готовые конфиги ветки `main`.
 
 ## Какие категории доступны
 
 Полный список с количеством правил в каждой - [`INDEX.md`](https://github.com/x-netloc/shadowrocket-autorules/blob/dist/INDEX.md).
 
-Описания категорий - в [README апстрима](https://github.com/runetfreedom/russia-v2ray-rules-dat#какие-категории-содержатся-в-файлах). Набор собираемых категорий задается в [`categories.txt`](categories.txt).
+Описания категорий - в [README апстрима](https://github.com/runetfreedom/russia-v2ray-rules-dat#какие-категории-содержатся-в-файлах). Набор собираемых категорий задается в [`autorules/catalog.toml`](https://github.com/x-netloc/autorules/blob/main/catalog.toml); локального дублирующего списка здесь больше нет.
 
 ## Prebuilt конфиги
 
-Готовые `.conf` файлы импортируются в Shadowrocket целиком: `Config -> Add Config -> URL`.
+Готовые `.conf` файлы генерируются из профилей `autorules` и импортируются в Shadowrocket целиком: `Config -> Add Config -> URL`.
 
 | Конфиг | Описание | URL для импорта |
 | --- | --- | --- |
@@ -38,7 +38,7 @@ RULE-SET,https://cdn.jsdelivr.net/gh/x-netloc/shadowrocket-autorules@dist/geoip/
 
 ## Ограничения
 
-Shadowrocket не поддерживает regex по домену, поэтому `regexp:` записи из апстрима при конвертации пропускаются. `domain:`, `full:`, `keyword:` и CIDR v4/v6 конвертируются один в один.
+Shadowrocket не поддерживает regex по домену, поэтому `regexp:` записи из upstream-наборов при конвертации `.list` пропускаются. Если regex появится непосредственно в профиле, сборка завершится ошибкой, чтобы не изменить смысл маршрутизации незаметно. `domain:`, `full:`, `keyword:` и CIDR v4/v6 конвертируются один в один.
 
 ## Благодарности
 
