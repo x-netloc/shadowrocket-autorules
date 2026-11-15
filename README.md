@@ -28,7 +28,7 @@
 
 ```
 RULE-SET,https://cdn.jsdelivr.net/gh/x-netloc/shadowrocket-autorules@dist/geosite/ru-blocked.list,PROXY
-RULE-SET,https://cdn.jsdelivr.net/gh/x-netloc/shadowrocket-autorules@dist/geoip/ru-blocked.list,PROXY,no-resolve
+RULE-SET,https://cdn.jsdelivr.net/gh/x-netloc/shadowrocket-autorules@dist/geoip/ru-blocked.list,PROXY
 ```
 
 Шаблон URL:

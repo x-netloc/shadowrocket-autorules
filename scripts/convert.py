@@ -62,7 +62,7 @@ def convert_geoip_line(line: str) -> str | None:
     if not line or line.startswith("#"):
         return None
     rule_type = "IP-CIDR6" if ":" in line else "IP-CIDR"
-    return f"{rule_type},{line},no-resolve"
+    return f"{rule_type},{line}"
 
 
 def convert_category(
@@ -119,7 +119,7 @@ def render_cidr_rule(value: str, action: str) -> str:
     except ValueError as exc:
         raise ConversionError(f"invalid CIDR profile rule: {value}") from exc
     rule_type = "IP-CIDR6" if version == 6 else "IP-CIDR"
-    return f"{rule_type},{value},{action},no-resolve"
+    return f"{rule_type},{value},{action}"
 
 
 def render_config(
@@ -160,9 +160,8 @@ def render_config(
 
         if selector in {"geosite", "geoip"}:
             for category in rule[selector]:
-                suffix = ",no-resolve" if selector == "geoip" else ""
                 lines.append(
-                    f"RULE-SET,{rules_base}/{selector}/{category}.list,{action}{suffix}"
+                    f"RULE-SET,{rules_base}/{selector}/{category}.list,{action}"
                 )
         elif selector == "domains":
             lines.extend(render_domain_rule(value, action) for value in rule[selector])

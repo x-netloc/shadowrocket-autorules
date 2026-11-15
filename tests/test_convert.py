@@ -31,11 +31,11 @@ class LineConversionTests(unittest.TestCase):
     def test_geoip_rules(self) -> None:
         self.assertEqual(
             convert_geoip_line("192.0.2.0/24"),
-            "IP-CIDR,192.0.2.0/24,no-resolve",
+            "IP-CIDR,192.0.2.0/24",
         )
         self.assertEqual(
             convert_geoip_line("2001:db8::/32"),
-            "IP-CIDR6,2001:db8::/32,no-resolve",
+            "IP-CIDR6,2001:db8::/32",
         )
 
 
@@ -60,11 +60,11 @@ class ConfigRenderingTests(unittest.TestCase):
             rendered,
         )
         self.assertIn(
-            "RULE-SET,https://cdn.jsdelivr.net/gh/owner/repo@dist/geoip/blocked.list,REJECT,no-resolve",
+            "RULE-SET,https://cdn.jsdelivr.net/gh/owner/repo@dist/geoip/blocked.list,REJECT",
             rendered,
         )
         self.assertIn("DOMAIN,www.example.com,DIRECT", rendered)
-        self.assertIn("IP-CIDR6,2001:db8::/32,DIRECT,no-resolve", rendered)
+        self.assertIn("IP-CIDR6,2001:db8::/32,DIRECT", rendered)
         self.assertTrue(rendered.endswith("FINAL,PROXY\n"))
 
     def test_profile_regexp_fails_instead_of_changing_semantics(self) -> None:
@@ -143,7 +143,7 @@ geosite = ["private"]
                 (root / "out/geosite/private.list").read_text(encoding="utf-8"),
             )
             self.assertIn(
-                "IP-CIDR,192.0.2.0/24,no-resolve",
+                "IP-CIDR,192.0.2.0/24",
                 (root / "out/geoip/private.list").read_text(encoding="utf-8"),
             )
             self.assertTrue((root / "out/configs/example.conf").is_file())
